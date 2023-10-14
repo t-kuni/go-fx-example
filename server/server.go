@@ -5,13 +5,21 @@ import (
 	a1 "github.com/t-kuni/go-fx-example/a/a"
 	a2 "github.com/t-kuni/go-fx-example/b/a"
 	"github.com/t-kuni/go-fx-example/logger"
+	"github.com/t-kuni/go-fx-example/services"
 	"go.uber.org/fx"
 	"io"
 	"net"
 	"net/http"
 )
 
-func NewHTTPServer(lc fx.Lifecycle, mux *http.ServeMux, log *logger.Logger, t1 *a1.Test, t2 *a2.Test) *http.Server {
+func NewHTTPServer(
+	lc fx.Lifecycle,
+	mux *http.ServeMux,
+	log *logger.Logger,
+	t1 *a1.Test,
+	t2 *a2.Test,
+	s services.IDummyService,
+) *http.Server {
 	srv := &http.Server{Addr: ":44444", Handler: mux}
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
@@ -23,6 +31,7 @@ func NewHTTPServer(lc fx.Lifecycle, mux *http.ServeMux, log *logger.Logger, t1 *
 
 			t1.Hello()
 			t2.Hello()
+			s.Hello()
 
 			go srv.Serve(ln)
 			return nil

@@ -5,6 +5,7 @@ import (
 	a2 "github.com/t-kuni/go-fx-example/b/a"
 	"github.com/t-kuni/go-fx-example/logger"
 	"github.com/t-kuni/go-fx-example/server"
+	"github.com/t-kuni/go-fx-example/services"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
 )
@@ -21,6 +22,7 @@ func NewContainer(opts ...fx.Option) *fx.App {
 			a1.NewTest,
 			a2.NewTest,
 			logger.NewLogger,
+			services.NewDummyServiceImplA,
 		),
 	}
 	mergedOpts = append(mergedOpts, opts...)

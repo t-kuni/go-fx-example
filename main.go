@@ -7,6 +7,8 @@ import (
 )
 
 func main() {
-	cont := container.NewContainer(fx.Invoke(func(server *http.Server) {}))
+	cont := container.NewContainer(
+		fx.Invoke(func(server *http.Server) {}),
+	)
 	cont.Run()
 }

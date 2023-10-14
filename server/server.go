@@ -20,6 +20,10 @@ func NewHTTPServer(lc fx.Lifecycle, mux *http.ServeMux, log *logger.Logger, t1 *
 				return err
 			}
 			log.SimpleInfoF("Starting HTTP server")
+
+			t1.Hello()
+			t2.Hello()
+
 			go srv.Serve(ln)
 			return nil
 		},

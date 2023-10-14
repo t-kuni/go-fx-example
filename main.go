@@ -26,10 +26,10 @@ func main() {
 			logger.NewLogger,
 		),
 		fx.Invoke(func(*http.Server) {}),
-	)
+	).Run()
 }
 
-func NewHTTPServer(lc fx.Lifecycle, mux *http.ServeMux, log *logger.Logger, t1 *a.Test, t2 *a.Test) *http.Server {
+func NewHTTPServer(lc fx.Lifecycle, mux *http.ServeMux, log *logger.Logger, t1 *a.Test, t2 *a2.Test) *http.Server {
 	srv := &http.Server{Addr: ":44444", Handler: mux}
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
@@ -38,6 +38,10 @@ func NewHTTPServer(lc fx.Lifecycle, mux *http.ServeMux, log *logger.Logger, t1 *
 				return err
 			}
 			log.SimpleInfoF("Starting HTTP server")
+
+			t1.Hello()
+			t2.Hello()
+
 			go srv.Serve(ln)
 			return nil
 		},
@@ -62,6 +66,7 @@ func (h *EchoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if _, err := io.Copy(w, r.Body); err != nil {
 		h.log.SimpleFatal(err, nil)
 	}
+	h.log.SimpleInfoF("Hello from EchoHandler")
 }
 func NewServeMux(echo *EchoHandler) *http.ServeMux {
 	mux := http.NewServeMux()

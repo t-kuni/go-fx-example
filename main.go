@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"github.com/t-kuni/go-fx-example/a/a"
+	a2 "github.com/t-kuni/go-fx-example/b/a"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
 	"go.uber.org/zap"
@@ -19,13 +21,15 @@ func main() {
 			NewHTTPServer,
 			NewServeMux,
 			NewEchoHandler,
+			a.NewTest,
+			a2.NewTest,
 			zap.NewExample,
 		),
 		fx.Invoke(func(*http.Server) {}),
 	).Run()
 }
 
-func NewHTTPServer(lc fx.Lifecycle, mux *http.ServeMux, log *zap.Logger) *http.Server {
+func NewHTTPServer(lc fx.Lifecycle, mux *http.ServeMux, log *zap.Logger, t1 *a.Test, t2 *a.Test) *http.Server {
 	srv := &http.Server{Addr: ":44444", Handler: mux}
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {

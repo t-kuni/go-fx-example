@@ -3,7 +3,9 @@ package container
 import (
 	a1 "github.com/t-kuni/go-fx-example/a/a"
 	a2 "github.com/t-kuni/go-fx-example/b/a"
+	"github.com/t-kuni/go-fx-example/handlers"
 	"github.com/t-kuni/go-fx-example/logger"
+	"github.com/t-kuni/go-fx-example/router"
 	"github.com/t-kuni/go-fx-example/server"
 	"github.com/t-kuni/go-fx-example/services"
 	"go.uber.org/fx"
@@ -17,8 +19,8 @@ func NewContainer(opts ...fx.Option) *fx.App {
 		}),
 		fx.Provide(
 			server.NewHTTPServer,
-			server.NewServeMux,
-			server.NewEchoHandler,
+			router.NewServeMux,
+			handlers.NewEchoHandler,
 			a1.NewTest,
 			a2.NewTest,
 			logger.NewLogger,

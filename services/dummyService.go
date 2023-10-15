@@ -2,6 +2,10 @@
 
 package services
 
+import (
+	"go.uber.org/fx"
+)
+
 type IDummyService interface {
 	Hello() string
 }
@@ -20,8 +24,16 @@ func (t *DummyServiceImplA) Hello() string {
 type DummyServiceImplB struct {
 }
 
-func NewDummyServiceImplB() IDummyService {
-	return &DummyServiceImplB{}
+func NewDummyServiceImplB(lc fx.Lifecycle) (IDummyService, error) {
+	//lc.Append(fx.Hook{
+	//	OnStart: func(ctx context.Context) error {
+	//		return errors.Wrap(types.NewBasicBusinessError("error from NewDummyServiceImplB#OnStart", nil))
+	//	},
+	//})
+
+	//return nil, errors.Wrap(types.NewBasicBusinessError("error from NewDummyServiceImplB#OnStart", nil))
+
+	return &DummyServiceImplB{}, nil
 }
 
 func (t *DummyServiceImplB) Hello() string {

@@ -39,25 +39,30 @@ func NewLogger() (*Logger, error) {
 	}, nil
 }
 
+const fxEventErrFieldName = "Err"
+
 func (l *Logger) LogEvent(event fxevent.Event) {
-	eventDetail, err := StructToMap(event)
+	eventName := reflect.TypeOf(event).Elem().Name()
+	eventErr := getErrField(event)
+
+	eventDetail, err := structToMap(event)
 	if err != nil {
 		panic(err)
 	}
-	eventName := reflect.TypeOf(event).Elem().Name()
+	delete(eventDetail, fxEventErrFieldName)
 
-	if eventDetail["Err"] == nil {
+	if eventErr == nil {
 		l.logger.
 			WithFields(map[string]interface{}{"event": eventDetail}).
-			Trace(fmt.Sprintf("[Fx Event] %s", eventName))
+			Trace(fmt.Sprintf("[Fx Event: %s]", eventName))
 	} else {
 		l.logger.
 			WithFields(map[string]interface{}{"event": eventDetail}).
-			Error(fmt.Sprintf("[Fx Event] %s: %+v", eventName, eventDetail["Err"]))
+			Error(fmt.Sprintf("[Fx Event: %s] %+v", eventName, eventErr))
 	}
 }
 
-func StructToMap(s interface{}) (map[string]interface{}, error) {
+func structToMap(s interface{}) (map[string]interface{}, error) {
 	data, err := json.Marshal(s)
 	if err != nil {
 		return nil, err
@@ -70,6 +75,21 @@ func StructToMap(s interface{}) (map[string]interface{}, error) {
 	}
 
 	return m, nil
+}
+
+func getErrField(event fxevent.Event) error {
+	fields := reflect.ValueOf(event)
+	if fields.Kind() == reflect.Ptr {
+		fields = fields.Elem()
+	}
+
+	var e error
+	errField := fields.FieldByName(fxEventErrFieldName)
+	if errField.IsValid() && !errField.IsNil() && errField.Type() == reflect.TypeOf((*error)(nil)).Elem() {
+		e = errField.Interface().(error)
+	}
+
+	return e
 }
 
 func (l *Logger) SimpleInfoF(format string, args ...interface{}) {
